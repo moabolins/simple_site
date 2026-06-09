@@ -3,35 +3,746 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Simple Site</title>
-    <link rel="stylesheet" href="style.css">
+    <title>My Blog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+        /*  background: white;
+            background: linear-gradient(135deg, #008E00 0%, #00008E 100%); */
+            background-image: 
+               url('images/half-face.jpg'),
+               linear-gradient(135deg, #008E00 0%, #00008E 100%);
+            background-position: 
+               left center,
+               0 0;
+            background-repeat: 
+               no-repeat,
+               no-repeat;
+            background-size: 
+               8rem auto,
+               cover;
+        }
+        /* 200px */
+
+        /* Header */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1200px;
+            margin: 4rem auto;
+        /*  padding: 0 2rem;
+            padding-top: 100px; # Header height + desired spacing */
+            padding: 3rem;  /* top right left bottom - cleaner! */
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            max-width: 600px;
+        }
+
+        /* Filter Tabs */
+        .filters {
+            max-width: 1200px;
+            margin: 3rem auto 2rem;
+            padding: 0 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Posts Grid */
+        .posts-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+        .post-card[data-category="family"]               { background-color: #e770ff;  /* pink */ }
+        .post-card[data-category="family"]   .post-image { background-color: #e770ff;  /* pink */ }
+        .post-card[data-category="activity"]             { background-color: #50df4f;  /* green */ }
+        .post-card[data-category="activity"] .post-image { background-color: #50df4f;  /* green */ }
+        .post-card[data-category="thoughts"]             { background-color: #70b3ff;  /* blue */ }
+        .post-card[data-category="thoughts"] .post-image { background-color: #70b3ff;  /* blue */ }
+
+        .post-image {
+            width: 100%;
+            height: 240px;
+            object-fit: contain;
+            background: var(--bg-light);
+        }
+            /* original value:   height: 240px;
+               use object-fit: cover to fill the space with image even if it crops
+               use object-fit: contain to display the entire image even if it leaves gaps on the edges */
+
+
+        .post-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .post-category {
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .post-date {
+            color: var(--text-light);
+        }
+
+        .post-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+            color: var(--text-dark);
+        }
+
+        .post-excerpt {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .read-more {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .read-more:hover {
+            gap: 0.75rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+    /*  .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            margin: 2rem auto;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+               max-width: 800px;  */
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 1200px;
+        /*  max-height: 90vh;
+            width: auto; */
+            width: 90%;
+            margin: 2rem auto;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        /*  display: flex;
+            flex-direction: column; */
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: white;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            background: var(--bg-light);
+        }
+
+        /* Gallery Controls */
+        .modal-image-container {
+            position: relative;
+            background: var(--bg-light);
+        }
+
+      /*.modal-image {
+            width: 100%;
+            max-height: 800px;
+            object-fit: contain;
+            border-radius: 12px 12px 0 0;
+            display: block;
+        }
+               orig:  max-height: 400px;
+      */
+
+        .modal-image {
+      /*    width: 100%; */
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 12px 12px 0 0;
+            display: block;
+            margin: 0 auto;
+            background: var(--bg-light);
+        }
+
+        .gallery-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .modal-image-container:hover .gallery-controls {
+            opacity: 1;
+        }
+
+        .gallery-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+            color: var(--text-dark);
+            pointer-events: all;
+        }
+
+        .gallery-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .gallery-btn:active {
+            transform: scale(0.95);
+        }
+
+        .image-counter {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        /* Thumbnail Strip */
+        .thumbnail-container {
+            display: none;
+            gap: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .thumbnail-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .thumbnail-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .thumbnail-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .thumbnail {
+            flex-shrink: 0;
+            width: 80px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            opacity: 0.6;
+        }
+
+        .thumbnail:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary);
+            opacity: 1;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .modal-body {
+            padding: 3rem;
+            background: white;
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .modal-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .posts-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .modal-body {
+                padding: 2rem;
+            }
+
+            .modal-title {
+                font-size: 2rem;
+            }
+
+            .gallery-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Hidden class for filtering */
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Welcome to My Simple Site</h1>
+        <nav>
+            <a href="/" class="logo">Maris Abolins</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+    <!--
+                <li><a href="about.html">About</a></li>
+                <li><a href="links.html">Links</a></li>
+    -->
+            </ul>
+        </nav>
     </header>
-    
-    <main>
-        <section>
-            <h2>About This Site</h2>
-            <p>This is a simple demonstration of GitHub Pages.</p>
-            <button id="clickBtn">Click Me!</button>
-            <p id="message"></p>
-        </section>
-        
-        <section>
-            <h2>Gallery</h2>
-            <div class="gallery">
-                <img src="images/IMG_8800.jpg" alt="Photo 1">
-                <img src="images/IMG_8804.jpg" alt="Photo 2">
+
+    <section class="hero">
+        <h1>Life is good!</h1>
+        <p>Moments from my life. <br>How I see things.</p>
+    </section>
+
+    <div class="filters">
+        <button class="filter-btn active" data-category="all">All Posts</button>
+        <button class="filter-btn" data-category="activity">Activities</button>
+        <button class="filter-btn" data-category="family">Family</button>
+        <button class="filter-btn" data-category="thoughts">Thoughts</button>
+    </div>
+
+    <div class="posts-container" id="postsContainer"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="postModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            
+            <div class="modal-body">
+                <div class="post-meta">
+                    <span class="post-category" id="modalCategory"></span>
+                    <span class="post-date" id="modalDate"></span>
+                </div>
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <div class="modal-text" id="modalText"></div>
             </div>
-        </section>
-    </main>
-    
-    <footer>
-        <p>&copy; 2024 My Simple Site</p>
-    </footer>
-    
-    <script src="script.js"></script>
+            
+            <div class="modal-image-container">
+                <img class="modal-image" id="modalImage" src="" alt="">
+                
+                <!-- Gallery Controls -->
+                <div class="gallery-controls" id="galleryControls">
+                    <button class="gallery-btn prev-btn" onclick="prevImage()">‹</button>
+                    <button class="gallery-btn next-btn" onclick="nextImage()">›</button>
+                    <div class="image-counter" id="imageCounter"></div>
+                </div>
+            </div>
+
+            <!-- Thumbnail Strip -->
+            <div class="thumbnail-container" id="thumbnailContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let posts = [];
+        let currentImageIndex = 0;
+        let currentPost = null;
+
+        // Load all posts from external files
+        async function loadPosts() {
+            try {
+                // First, load the manifest to get list of post files
+                // const manifestResponse = await fetch('posts/manifest.json');
+                //    appended ?v=${VERSION} as a cache-busting feature so I can force browser to load updated version
+                //       const VERSION = '1.0.0';
+                //       const manifestResponse = await fetch(`posts/manifest.json?v=${VERSION}`);
+                //    later replaced it with this, so that manifest is never cached; then I put version number into the manifest.json
+                const manifestResponse = await fetch(`posts/manifest.json?v=${Date.now()}`);
+                const manifest = await manifestResponse.json();
+                
+                // Load each post file
+                const postPromises = manifest.posts.map(filename => 
+                    // fetch(`posts/${filename}`).then(res => res.json())
+                    // I put version number into the manifest.json
+                    fetch(`posts/${filename}?v=${manifest.version}`).then(res => res.json())
+                );
+                
+                posts = await Promise.all(postPromises);
+                
+                // Sort posts by date (newest first) - optional
+                posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Render the posts
+                renderPosts();
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                document.getElementById('postsContainer').innerHTML = 
+                    '<p style="text-align: center; color: #6b7280; padding: 2rem;">Error loading posts. Make sure you\'re running this from a web server.</p>';
+            }
+        }
+
+        // Render posts
+        function renderPosts(filteredPosts = posts) {
+            const container = document.getElementById('postsContainer');
+            
+            if (filteredPosts.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 2rem;">No posts found in this category.</p>';
+                return;
+            }
+            
+            container.innerHTML = filteredPosts.map(post => `
+                <article class="post-card" onclick="openModal(${post.id})" data-category="${post.category}">
+                    <img src="${post.images[0]}" alt="${post.title}" class="post-image">
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">${post.category}</span>
+                            <span class="post-date">${post.date}</span>
+                        </div>
+                        <h3 class="post-title">${post.title}</h3>
+                        <p class="post-excerpt">${post.excerpt}</p>
+                        <a href="#" class="read-more">Read more →</a>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active state
+                filterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Filter posts
+                const category = this.dataset.category;
+                if (category === 'all') {
+                    renderPosts(posts);
+                } else {
+                    const filtered = posts.filter(post => post.category === category);
+                    renderPosts(filtered);
+                }
+            });
+        });
+
+        // Modal functions
+        function openModal(postId) {
+            currentPost = posts.find(p => p.id === postId);
+            currentImageIndex = 0;
+            const modal = document.getElementById('postModal');
+            
+            updateModalContent();
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateModalContent() {
+            document.getElementById('modalImage').src = currentPost.images[currentImageIndex];
+            document.getElementById('modalCategory').textContent = currentPost.category;
+            document.getElementById('modalDate').textContent = currentPost.date;
+            document.getElementById('modalTitle').textContent = currentPost.title;
+            document.getElementById('modalText').textContent = currentPost.content;
+            
+            // Update gallery controls visibility
+            const galleryControls = document.getElementById('galleryControls');
+            const imageCounter = document.getElementById('imageCounter');
+            
+            if (currentPost.images.length > 1) {
+                galleryControls.style.display = 'flex';
+                imageCounter.textContent = `${currentImageIndex + 1} / ${currentPost.images.length}`;
+            } else {
+                galleryControls.style.display = 'none';
+            }
+
+            // Update thumbnail indicators
+            updateThumbnails();
+        }
+
+        function updateThumbnails() {
+            const thumbnailContainer = document.getElementById('thumbnailContainer');
+            
+            if (currentPost.images.length > 1) {
+                thumbnailContainer.innerHTML = currentPost.images.map((img, index) => `
+                    <div class="thumbnail ${index === currentImageIndex ? 'active' : ''}" 
+                         onclick="goToImage(${index})">
+                        <img src="${img}" alt="Thumbnail ${index + 1}">
+                    </div>
+                `).join('');
+                thumbnailContainer.style.display = 'flex';
+            } else {
+                thumbnailContainer.style.display = 'none';
+            }
+        }
+
+        function nextImage() {
+            if (currentImageIndex < currentPost.images.length - 1) {
+                currentImageIndex++;
+                updateModalContent();
+            }
+        }
+
+        function prevImage() {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                updateModalContent();
+            }
+        }
+
+        function goToImage(index) {
+            currentImageIndex = index;
+            updateModalContent();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('postModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            currentPost = null;
+            currentImageIndex = 0;
+        }
+
+        // Close modal on outside click
+        document.getElementById('postModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (currentPost) {
+                if (e.key === 'ArrowRight') nextImage();
+                if (e.key === 'ArrowLeft') prevImage();
+                if (e.key === 'Escape') closeModal();
+            }
+        });
+
+        // Initialize - load posts when page loads
+        loadPosts();
+    </script>
+
 </body>
 </html>
