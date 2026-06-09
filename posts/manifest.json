@@ -1,0 +1,9 @@
+{
+    "version": "1.0.2",
+    "posts": [
+        "post-t2.json",
+        "post-t1.json",
+        "post-f1.json",
+        "post-a1.json"
+    ]
+}
