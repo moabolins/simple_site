@@ -110,6 +110,24 @@
             color: #8b92a0;
         }
 
+        .hero p.quote-display {
+            font-size: 1.25rem;
+            font-style: italic;
+            color: #ab7a5b;
+            max-width: 600px;
+            margin-top: 1rem;
+        }
+
+        .quote-attribution {
+            display: block;
+            font-style: normal;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 0.4rem;
+            color: #9b8a4b; /* greener shade for the byline */
+        }
+
+
         /* Filter Tabs */
         .filters {
             max-width: 1200px;
@@ -526,6 +544,7 @@
     <section class="hero">
         <h1>Life is good!</h1>
         <p class="muted">Moments from my life. <br>How I see things.</p>
+        <p class="quote-display" id="quoteDisplay"></p>
     </section>
 
     <div class="filters">
@@ -571,6 +590,86 @@
         let posts = [];
         let currentImageIndex = 0;
         let currentPost = null;
+
+        // Parse a single CSV line into an array of fields.
+        // Handles quoted fields (so commas inside a quoted quote don't split it)
+        // and doubled-quotes ("") as an escaped quote character.
+        function parseCSVLine(line) {
+            const fields = [];
+            let cur = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+
+                if (inQuotes) {
+                    if (char === '"') {
+                        if (line[i + 1] === '"') {
+                            cur += '"'; // escaped quote
+                            i++;
+                        } else {
+                            inQuotes = false;
+                        }
+                    } else {
+                        cur += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === ',') {
+                        fields.push(cur.trim());
+                        cur = '';
+                    } else {
+                        cur += char;
+                    }
+                }
+            }
+            fields.push(cur.trim());
+            return fields;
+        }
+
+
+        // Parse full CSV text into an array of dictionaries:
+        // { quote, author, date, source }
+        function parseQuotesCSV(text) {
+            return text
+                .split(/\r?\n/)
+                .filter(line => line.trim() !== '')
+                .map(line => {
+                    const [quote, author, date, source] = parseCSVLine(line);
+                    return { quote, author, date, source };
+                });
+        }
+
+        // Step 1: read quotes.csv into an internal array of dictionaries
+        async function loadQuotes() {
+            try {
+                const response = await fetch(`quotes.csv?v=${Date.now()}`);
+                const text = await response.text();
+                quotes = parseQuotesCSV(text);
+                renderRandomQuote();
+            } catch (error) {
+                console.error('Error loading quotes:', error);
+                // Fail quietly - just leave the quote area empty
+            }
+        }
+
+        // Step 2 & 3: pick a random valid row and present it in the HTML
+        function renderRandomQuote() {
+            if (!quotes.length) return;
+
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            const { quote, author, date, source } = quotes[randomIndex];
+
+            const attributionParts = [author, date, source].filter(Boolean);
+            const attributionText = attributionParts.join(' — ');
+
+            document.getElementById('quoteDisplay').innerHTML = `
+                "${quote}"
+                <span class="quote-attribution">${attributionText}</span>
+            `;
+        }
+
 
         // Load all posts from external files
         async function loadPosts() {
@@ -666,7 +765,7 @@
             document.getElementById('modalCategory').textContent = currentPost.category;
             document.getElementById('modalDate').textContent = currentPost.date;
             document.getElementById('modalTitle').textContent = currentPost.title;
-            document.getElementById('modalText').textContent = currentPost.content;
+            document.getElementById('modalText').innerHTML = currentPost.content;
             
             // Update gallery controls visibility
             const galleryControls = document.getElementById('galleryControls');
@@ -742,8 +841,9 @@
             }
         });
 
-        // Initialize - load posts when page loads
+        // Initialize - load posts and quote when page loads
         loadPosts();
+        loadQuotes();
     </script>
 
 </body>
